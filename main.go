@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/picolloo/go-playground/handlers"
@@ -25,6 +27,18 @@ func main() {
     WriteTimeout: 1 * time.Second,
   }
 
+  go func() {
+    err := server.ListenAndServe()
+    if err != nil {
+      log.Fatal(err.Error())
+    }
+  }()
 
-  server.ListenAndServe()
+  sigChan := make(chan os.Signal)
+  signal.Notify(sigChan, os.Interrupt, os.Kill)
+  signal := <- sigChan
+  logger.Println("Received terminate, graceful shutdown", signal)
+
+  ctx, _ := context.WithTimeout(context.Background(), 30 * time.Second)
+  server.Shutdown(ctx)
 }
