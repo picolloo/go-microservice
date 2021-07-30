@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/picolloo/go-playground/handlers"
 )
@@ -16,5 +17,14 @@ func main() {
   mux := http.NewServeMux()
   mux.Handle("/", bodyHandler)
 
-  http.ListenAndServe(":3000", mux)
+  server := &http.Server{
+    Addr: ":3000",
+    Handler: mux,
+    IdleTimeout: 120 * time.Second,
+    ReadTimeout: 1 * time.Second,
+    WriteTimeout: 1 * time.Second,
+  }
+
+
+  server.ListenAndServe()
 }
