@@ -14,10 +14,10 @@ import (
 func main() {
 
   logger := log.New(os.Stdout, "product-api", log.LstdFlags)
-  bodyHandler := handlers.NewBody(logger)
+  postHandler := handlers.NewPostHandler(logger)
 
   mux := http.NewServeMux()
-  mux.Handle("/", bodyHandler)
+  mux.Handle("/", postHandler)
 
   server := &http.Server{
     Addr: ":3000",
