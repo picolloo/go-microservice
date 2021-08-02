@@ -21,6 +21,27 @@ func NewPostHandler(l *log.Logger) *PostHandler {
   }
 }
 
+func (h *PostHandler) AddPost(rw http.ResponseWriter, req *http.Request) {
+  h.logger.Println("Hit on PostHandler POST")
+
+  var p *post.Post
+  decoder := json.NewDecoder(req.Body)
+  err := decoder.Decode(&p)
+
+  if err != nil {
+    http.Error(rw, err.Error(), http.StatusBadRequest)
+    return
+  }
+
+  p = post.Create(p)
+  encoder := json.NewEncoder(rw)
+  err = encoder.Encode(&p)
+  if err != nil {
+    http.Error(rw, err.Error(), http.StatusBadRequest)
+    return
+  }
+}
+
 func (h *PostHandler) GetPosts(rw http.ResponseWriter, req *http.Request) {
   h.logger.Println("Hit on PostHandler GetPosts")
 
@@ -78,4 +99,20 @@ func (h *PostHandler) UpdatePost(rw http.ResponseWriter, req *http.Request) {
   if err != nil {
     http.Error(rw, "Unable to serialize post.", http.StatusBadRequest)
   }
+}
+
+func (h *PostHandler) Delete(rw http.ResponseWriter, req *http.Request) {
+  vars := mux.Vars(req)
+  post_id, _ := strconv.Atoi(vars["id"])
+
+  h.logger.Printf("Hit on PostHandler DELETE with ID: %d", post_id)
+
+  post, err := post.Remove(post_id)
+  if err != nil {
+    http.Error(rw, err.Error(), http.StatusNotFound)
+    return
+  }
+
+  encoder := json.NewEncoder(rw)
+  encoder.Encode(&post)
 }

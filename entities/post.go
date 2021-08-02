@@ -29,6 +29,15 @@ var postList = []*Post{
   },
 }
 
+func Create(post *Post) *Post {
+  post.ID= findNextId()
+  post.CreatedAt = time.Now().String()
+  post.UpdatedAt = time.Now().String()
+  postList = append(postList, post)
+
+  return post
+}
+
 func GetAll() []*Post {
   return postList
 }
@@ -40,4 +49,22 @@ func Get(id int) (*Post, error) {
     }
   }
   return nil, fmt.Errorf("Post not found")
+}
+
+func Remove(id int) (*Post, error) {
+  for idx, p := range(postList) {
+    if p.ID == id {
+      postList = append(postList[:idx], postList[idx+1:]...)
+      return p, nil
+    }
+  }
+  return nil, fmt.Errorf("Post not found")
+}
+
+
+func findNextId() int {
+  if len(postList) == 0 {
+    return 1
+  }
+ return postList[len(postList) - 1].ID + 1
 }

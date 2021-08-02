@@ -19,9 +19,11 @@ func main() {
 
   router := mux.NewRouter()
 
+  router.HandleFunc("/posts", postHandler.AddPost).Methods("POST")
   router.HandleFunc("/posts", postHandler.GetPosts).Methods("GET")
   router.HandleFunc("/posts/{id:[0-9]+}", postHandler.GetPost).Methods("GET")
   router.HandleFunc("/posts/{id:[0-9]+}", postHandler.UpdatePost).Methods("PUT")
+  router.HandleFunc("/posts/{id:[0-9]+}", postHandler.Delete).Methods("DELETE")
 
   server := &http.Server{
     Addr: ":3000",
