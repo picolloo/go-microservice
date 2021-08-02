@@ -1,6 +1,9 @@
-package entities
+package post
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Post struct {
   ID int `json:"id"`
@@ -13,7 +16,7 @@ type Post struct {
   UpdatedAt string `json:"-"`
 }
 
-var PostList = []*Post{
+var postList = []*Post{
   {
     ID: 1,
     Title: "First blog post",
@@ -26,3 +29,15 @@ var PostList = []*Post{
   },
 }
 
+func GetAll() []*Post {
+  return postList
+}
+
+func Get(id int) (*Post, error) {
+  for _, p := range(postList) {
+    if p.ID == id {
+      return p, nil
+    }
+  }
+  return nil, fmt.Errorf("Post not found")
+}

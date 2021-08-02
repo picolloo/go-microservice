@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/picolloo/go-playground/handlers"
 )
 
@@ -16,12 +17,15 @@ func main() {
   logger := log.New(os.Stdout, "product-api", log.LstdFlags)
   postHandler := handlers.NewPostHandler(logger)
 
-  mux := http.NewServeMux()
-  mux.Handle("/", postHandler)
+  router := mux.NewRouter()
+
+  router.HandleFunc("/posts", postHandler.GetPosts).Methods("GET")
+  router.HandleFunc("/posts/{id:[0-9]+}", postHandler.GetPost).Methods("GET")
+  router.HandleFunc("/posts/{id:[0-9]+}", postHandler.UpdatePost).Methods("PUT")
 
   server := &http.Server{
     Addr: ":3000",
-    Handler: mux,
+    Handler: router,
     IdleTimeout: 120 * time.Second,
     ReadTimeout: 1 * time.Second,
     WriteTimeout: 1 * time.Second,
