@@ -43,24 +43,34 @@ func GetAll() []*Post {
 }
 
 func Get(id int) (*Post, error) {
-  for _, p := range(postList) {
-    if p.ID == id {
-      return p, nil
-    }
+  _, post, err := findPost(id)
+
+  if err != nil {
+    return nil, err
   }
-  return nil, fmt.Errorf("Post not found")
+
+  return post, nil
 }
 
 func Remove(id int) (*Post, error) {
-  for idx, p := range(postList) {
-    if p.ID == id {
-      postList = append(postList[:idx], postList[idx+1:]...)
-      return p, nil
-    }
+  idx, post, err := findPost(id)
+
+  if err != nil {
+    return nil, err
   }
-  return nil, fmt.Errorf("Post not found")
+
+  postList = append(postList[:idx], postList[idx+1:]...)
+  return post, nil
 }
 
+func findPost(id int) (int, *Post, error) {
+  for idx, p := range(postList) {
+    if p.ID == id {
+      return idx, p, nil
+    }
+  }
+  return -1, nil, fmt.Errorf("Post not found")
+}
 
 func findNextId() int {
   if len(postList) == 0 {
