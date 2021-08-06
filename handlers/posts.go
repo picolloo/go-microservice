@@ -71,21 +71,29 @@ func (h *PostHandler) UpdatePost(rw http.ResponseWriter, req *http.Request) {
   vars := mux.Vars(req)
   post_id, _ := strconv.Atoi(vars["id"])
 
-  post, err := post.Get(post_id)
+  var p *post.Post
+
+  decoder := json.NewDecoder(req.Body)
+  err := decoder.Decode(&p)
   if err != nil {
-    http.Error(rw, "Invalid post ID", http.StatusBadRequest)
+    http.Error(rw, err.Error(), http.StatusBadRequest)
     return
   }
 
-  decoder := json.NewDecoder(req.Body)
-  err = decoder.Decode(&post)
+  h.logger.Println(p)
+
+  p.ID = post_id
+  h.logger.Println(p)
+
+  p, err = post.Update(p)
+  h.logger.Println(p)
   if err != nil {
-    http.Error(rw, "Invalid payload", http.StatusBadRequest)
+    http.Error(rw, err.Error(), http.StatusBadRequest)
     return
   }
 
   encoder := json.NewEncoder(rw)
-  err = encoder.Encode(&post)
+  err = encoder.Encode(&p)
 
   if err != nil {
     http.Error(rw, "Unable to serialize post.", http.StatusBadRequest)

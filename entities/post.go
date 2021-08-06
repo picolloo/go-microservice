@@ -3,6 +3,8 @@ package post
 import (
 	"fmt"
 	"time"
+
+	"github.com/imdario/mergo"
 )
 
 type Post struct {
@@ -63,6 +65,19 @@ func Remove(id int) (*Post, error) {
   return post, nil
 }
 
+func Update(p *Post) (*Post, error) {
+  _, post, err := findPost(p.ID)
+
+  if err != nil {
+    return nil, err
+  }
+
+  fmt.Printf("%+v", post)
+  mergo.Merge(&post, p)
+  fmt.Printf("%+v", post)
+  return post, nil
+}
+
 func findPost(id int) (int, *Post, error) {
   for idx, p := range(postList) {
     if p.ID == id {
@@ -76,5 +91,5 @@ func findNextId() int {
   if len(postList) == 0 {
     return 1
   }
- return postList[len(postList) - 1].ID + 1
+  return postList[len(postList) - 1].ID + 1
 }
